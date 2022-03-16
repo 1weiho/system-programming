@@ -25,7 +25,7 @@ int main() {
       printf("%d", output);
       if (j < 8) {
         next = num[i] * num[j + 1];
-        if (next / 10 > 0) {
+        if (next > 9) {
           printf("  ");
         } else {
           printf("   ");
