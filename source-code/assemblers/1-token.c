@@ -106,6 +106,7 @@ int ASM_token(char *buf)
   return (len);
 }
 
+/*
 int main(int argc, char *argv[]) {
   int i, c;
   char buf[LEN_SYMBOL];
@@ -121,3 +122,4 @@ int main(int argc, char *argv[]) {
     }
   }
 }
+*/
