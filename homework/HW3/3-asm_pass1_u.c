@@ -7,6 +7,7 @@
 /*  2019.12.13                                                         */
 /*  2021.03.26 Process error: format 1 & 2 instruction use + 		   */
 /***********************************************************************/
+#include <stdlib.h>
 #include <string.h>
 
 #include "2-optable.c"
@@ -31,6 +32,11 @@ typedef struct {
   unsigned fmt;
   unsigned addressing;
 } LINE;
+
+typedef struct {
+  char symbol[LEN_SYMBOL];
+  int loc;
+} SYMBOL_TABLE;
 
 int process_line(LINE *line);
 /* return LINE_EOF, LINE_COMMENT, LINE_ERROR, LINE_CORRECT and Instruction
@@ -207,6 +213,13 @@ int main(int argc, char *argv[]) {
   char buf[LEN_SYMBOL];
   LINE line;
 
+  // new variables
+  int locctr = -1;
+  int start_address;
+  SYMBOL_TABLE sym_table[200];
+  int symtab_count = 0;
+  int nextLocctr;
+
   if (argc < 2) {
     printf("Usage: %s fname.asm\n", argv[0]);
   } else {
@@ -219,12 +232,89 @@ int main(int argc, char *argv[]) {
           printf("%03d : Error\n", line_count);
         else if (c == LINE_COMMENT)
           printf("%03d : Comment line\n", line_count);
-        else
+        else {
+          /* source code
           printf("%03d : %12s %12s %12s,%12s (FMT=%X, ADDR=%X)\n", line_count,
                  line.symbol, line.op, line.operand1, line.operand2, line.fmt,
                  line.addressing);
+          */
+
+          /* Initial location counter */
+          if (locctr == -1) {
+            if (strcmp(line.op, "START") == 0) {
+              locctr = atoi(line.operand1);
+              start_address = atoi(line.operand1);
+              printf("%06X  %-7s %-7s %-7s\n", locctr, line.symbol, line.op,
+                     line.operand1);
+            } else {
+              locctr = 0;
+              start_address = 0;
+            }
+          } else {
+            /* insert to symbal table */
+            if (strcmp(line.symbol, "") != 0) {
+              int isExist = 0;
+              for (i = 0; i < symtab_count; i++) {
+                if (strcmp(line.symbol, sym_table[i].symbol) == 0) {
+                  isExist = 1;
+                  break;
+                }
+              }
+              if (!isExist) {
+                strcpy(sym_table[i].symbol, line.symbol);
+                sym_table[i].loc = locctr;
+                symtab_count++;
+              }
+            }
+
+            /* identity instruction */
+            if (strcmp(line.op, "WORD") == 0) {
+              nextLocctr = 3;
+            } else if (strcmp(line.op, "RESW") == 0) {
+              nextLocctr = 3 * atoi(line.operand1);
+            } else if (strcmp(line.op, "BYTE") == 0) {
+              if (line.operand1[0] == 'C') {
+                nextLocctr = strlen(line.operand1) - 3;
+              }
+              if (line.operand1[0] == 'X') {
+                nextLocctr = (strlen(line.operand1) - 3) / 2;
+              }
+            } else if (strcmp(line.op, "RESB") == 0) {
+              nextLocctr = atoi(line.operand1);
+            } else {
+              switch (line.fmt) {
+                case FMT4:
+                  nextLocctr = 4;
+                  break;
+                case FMT3:
+                  nextLocctr = 3;
+                  break;
+                case FMT2:
+                  nextLocctr = 2;
+                  break;
+                case FMT1:
+                  nextLocctr = 1;
+                  break;
+                case FMT0:
+                  nextLocctr = 0;
+                  break;
+              }
+            }
+
+            /* print line */
+            printf("%06X  %-7s %-7s %-7s\n", locctr, line.symbol, line.op,
+                   line.operand1);
+            locctr += nextLocctr;
+          }
+        }
       }
       ASM_close();
     }
+  }
+
+  printf(".\n.\n");
+  printf("Program length = %x\n", locctr - start_address);
+  for (i = 0; i < symtab_count; i++) {
+    printf("%-8s: %06X\n", sym_table[i].symbol, sym_table[i].loc);
   }
 }
