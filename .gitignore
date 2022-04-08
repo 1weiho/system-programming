@@ -1,1 +1,5 @@
+# MISC
 .DS_Store
+
+# C output file
+*.out
