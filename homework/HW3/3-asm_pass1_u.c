@@ -299,6 +299,30 @@ int main(int argc, char *argv[]) {
                   nextLocctr = 0;
                   break;
               }
+              if (line.addressing == ADDR_IMMEDIATE) {
+                int len = strlen(line.operand1) + 2;
+                char concated[len];
+                memset(concated, '\0', len);
+                strcat(concated, "#");
+                strcat(concated, line.operand1);
+                strcpy(line.operand1, concated);
+              }
+              if (line.addressing == ADDR_INDIRECT) {
+                int len = strlen(line.operand1) + 2;
+                char concated[len];
+                memset(concated, '\0', len);
+                strcat(concated, "@");
+                strcat(concated, line.operand1);
+                strcpy(line.operand1, concated);
+              }
+              if (line.fmt == FMT4) {
+                int len = strlen(line.op) + 2;
+                char concated[len];
+                memset(concated, '\0', len);
+                strcat(concated, "+");
+                strcat(concated, line.op);
+                strcpy(line.op, concated);
+              }
             }
 
             /* print line */
