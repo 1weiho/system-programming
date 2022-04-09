@@ -334,7 +334,7 @@ int main(int argc, char *argv[]) {
               printf(" %s, %s\n", line.operand1, line.operand2);
             }
             else {
-              printf(" %-7s\n", line.operand1);
+              printf(" %s\n", line.operand1);
             }
             locctr += nextLocctr;
           }
