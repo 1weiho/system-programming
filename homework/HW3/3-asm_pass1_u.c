@@ -267,7 +267,7 @@ int main(int argc, char *argv[]) {
               }
             }
 
-            /* identity instruction */
+            /* identify instruction */
             if (strcmp(line.op, "WORD") == 0) {
               nextLocctr = 3;
             } else if (strcmp(line.op, "RESW") == 0) {
