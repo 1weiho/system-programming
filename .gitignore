@@ -3,3 +3,6 @@
 
 # C output file
 *.out
+
+# test file
+test.*
