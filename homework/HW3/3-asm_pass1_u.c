@@ -326,8 +326,16 @@ int main(int argc, char *argv[]) {
             }
 
             /* print line */
-            printf("%06X  %-7s %-7s %-7s\n", locctr, line.symbol, line.op,
-                   line.operand1);
+            printf("%06X  %-7s %-7s", locctr, line.symbol, line.op);
+            if (line.addressing == (ADDR_INDEX | ADDR_SIMPLE)) {
+              printf(" %s, X\n", line.operand1);
+            } 
+            else if (line.fmt == FMT2) {
+              printf(" %s, %s\n", line.operand1, line.operand2);
+            }
+            else {
+              printf(" %-7s\n", line.operand1);
+            }
             locctr += nextLocctr;
           }
         }
